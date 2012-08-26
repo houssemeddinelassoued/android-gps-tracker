@@ -5,6 +5,8 @@ import java.util.Date;
 
 import com.yaqtek.gps.tracker.R;
 
+import com.yaqtek.gps.tracker.GpsIntentService;
+
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,8 +14,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +35,7 @@ public class MainActivity extends Activity implements LocationListener {
 	private LocationManager locationManager;
 	private ToggleButton gpsToggleBtn;
 	private String provider;
+	private GpsReceiver receiver;
 	
 	protected TextView latField;
 	protected TextView lonField;
@@ -47,9 +52,16 @@ public class MainActivity extends Activity implements LocationListener {
         gpsCheckStatus();
         
         // Instantiate GPS Toggle Button
-        Log.d(TAG,"Istantiating ToggleButton");
+        Log.d(TAG,"Instantiating ToggleButton");
         gpsToggleBtn = (ToggleButton)findViewById(R.id.gpsToggleBtn);
-       
+        
+        // Registers the Broadcast receiver for the IntentService
+        IntentFilter filter = new IntentFilter(GpsReceiver.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new GpsReceiver();
+        registerReceiver(receiver, filter);
+        
+        
         // Set latFeild on lonField
         latField = (TextView)findViewById(R.id.lat);
         lonField = (TextView)findViewById(R.id.lon);
@@ -98,14 +110,27 @@ public class MainActivity extends Activity implements LocationListener {
     }
     
     public void gpsStart(){
+    	/**
+    	 * Starts a GPS IntentService. Also begins updating the GPS location in 
+    	 * the main UI. The GPS 
+    	 * 
+    	 */
+    	// This starts a LocationManager and gets location SystemService
     	locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    	Criteria criteria = new Criteria();
+    	
+    	//Criteria criteria = new Criteria();  	
     	//provider = locationManager.getBestProvider(criteria, false);
     	provider = locationManager.GPS_PROVIDER;
+    	   	
     	Log.d(TAG,"Provider: " + provider);
         Location location = locationManager.getLastKnownLocation(provider);
         gpsUpdateLatLon(location);
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
+        
+        // Start GPS logging
+        gpsStartLog();
+        
+        // This causes this activity to listen for the onLocationChange broadcast.
+        locationManager.requestLocationUpdates(provider, 1000, 1, this);
         
     }
            
@@ -113,10 +138,23 @@ public class MainActivity extends Activity implements LocationListener {
     	
     }
     
+    public void gpsStartLog(){
+    	Log.d(TAG,"[gpsStartLog()]");
+    	Intent gpsIntent = new Intent(MainActivity.this, GpsIntentService.class);
+		gpsIntent.putExtra(GpsIntentService.PARAM_IN_MSG, "30*1000");
+		gpsIntent.putExtra(GpsIntentService.PARAM_GPS_DT, 30*1000);
+		
+		Log.d(TAG,"[gpsStartLog()] Starting gpsIntentService");
+		startService(gpsIntent);
+    }
+    
     public void gpsUpdateLatLon(Location location){
     	if (location != null) {
 	      System.out.println("Provider has been selected.");
+	      
+	      
 	      onLocationChanged(location);
+	      
 	    } else {
 	      providerField.setText("not available");
 	      latField.setText("not available");
@@ -128,6 +166,8 @@ public class MainActivity extends Activity implements LocationListener {
     }
     @Override
     public void onLocationChanged(Location location) {
+      // This is automatically called because this activity has registered
+	  // for requestLocationUpdates.
       double lat = (double) (location.getLatitude());
       double lon = (double) (location.getLongitude());
       Date date = new Date(location.getTime());
@@ -180,6 +220,25 @@ public class MainActivity extends Activity implements LocationListener {
       Toast.makeText(this, "Disabled provider " + provider,
           Toast.LENGTH_SHORT).show();
     }
+    
+    /**
+     * @author wilblack
+     * Receives the GpsIntentService broadcast 
+     */
+    public class GpsReceiver extends BroadcastReceiver {
+ 		public static final String ACTION_RESP = "com.yaqtek.gps.tracker";
+ 		
+ 		@Override
+ 		public void onReceive(Context context, Intent intent){
+ 			String text = intent.getStringExtra(GpsIntentService.PARAM_OUT_MSG);
+ 			Log.d(TAG, "text: ");
+ 			Toast toast = Toast.makeText(MainActivity.this,
+					text,
+					Toast.LENGTH_LONG);
+ 			toast.show();
+ 		}
+ 	}
+    
  }
     
     
