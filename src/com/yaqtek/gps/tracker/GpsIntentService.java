@@ -24,12 +24,15 @@ public class GpsIntentService extends IntentService{
     public static final String PARAM_OUT_MSG = "omsg";
     public static final String PARAM_GPS_DT = "gps_dt";
     
+    
+    boolean kill = false;
+    long gpsDt = 5*60*1000;
+    
     public String provider;
     String TAG = "GpsIntentService";
         
     public GpsIntentService() {
     	super("GpsIntentService");
-    	Log.d(TAG,"[GpsIntentService consturctor]");
     }
  
     /**
@@ -37,28 +40,24 @@ public class GpsIntentService extends IntentService{
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-    	Log.d(TAG,"[onHandleIntent()]");
-    	int gps_dt = intent.getIntExtra(PARAM_GPS_DT, 2*60*1000);
+    	
+    	gpsDt = intent.getLongExtra(PARAM_GPS_DT, 2*60*1000);
     	
     	int count = 0;
-        while (count < 20*48) {
-        	Log.d(TAG,"[onHandleIntent()] In while loop");
+        while (count < 20*48 && !kill) {
         	count++;
-        	
 	        String resultTxt = (String) DateFormat.format("MM/dd/yy h:mmaa - ", System.currentTimeMillis());
-	        
-	        
+	        	        
 	        // Get the location
 	        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	        provider  = locationManager.GPS_PROVIDER;
 	        Location location = locationManager.getLastKnownLocation(provider);
 	        
-	        // Create retrun text
+	        // Create result text
 	        double lat = location.getLatitude();
 	        double lon = location.getLongitude();
 	        resultTxt = resultTxt + "\nLat: "+lat+"\nLon: "+lon;
-	        Log.d(TAG,"resultTxt: "+resultTxt);
-	        
+	        	        
 	        // Create return braodcastIntent and give it the message
 	        // then send the broadcast.
 	        Intent broadcastIntent = new Intent();
@@ -66,7 +65,15 @@ public class GpsIntentService extends IntentService{
 	        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	        broadcastIntent.putExtra(PARAM_OUT_MSG, resultTxt);
 	        sendBroadcast(broadcastIntent);
-	        SystemClock.sleep(30*1000); // 30 seconds
+	        SystemClock.sleep(gpsDt); // 30 seconds
         }
+    }
+    
+    @Override
+     public void onDestroy() {
+    	kill = true;
+    	super.onDestroy();
+    	Log.d(TAG,"[onDestroy()]");
+    	
     }
 }

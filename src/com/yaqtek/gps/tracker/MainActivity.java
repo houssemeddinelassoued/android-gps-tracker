@@ -2,6 +2,7 @@ package com.yaqtek.gps.tracker;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.lang.Math;
 
 import com.yaqtek.gps.tracker.R;
 
@@ -20,20 +21,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.support.v4.app.NavUtils;
 
 public class MainActivity extends Activity implements LocationListener {
 	public String TAG = "GPS Tracker Main"; 
 	
 	private LocationManager locationManager;
 	private ToggleButton gpsToggleBtn;
+	private EditText gpsDtField;
 	private String provider;
 	private GpsReceiver receiver;
 	
@@ -41,6 +40,7 @@ public class MainActivity extends Activity implements LocationListener {
 	protected TextView lonField;
 	protected TextView gpsTimestampField;
 	protected TextView providerField;
+	private Intent gpsIntent; 
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,9 +51,10 @@ public class MainActivity extends Activity implements LocationListener {
         Log.d(TAG,"Checking GPS status");
         gpsCheckStatus();
         
-        // Instantiate GPS Toggle Button
-        Log.d(TAG,"Instantiating ToggleButton");
+        // Instantiate GPS Toggle Button, and GPS Dt field
+        gpsDtField = (EditText)findViewById(R.id.gpsDt);
         gpsToggleBtn = (ToggleButton)findViewById(R.id.gpsToggleBtn);
+        gpsToggleBtn.requestFocus();
         
         // Registers the Broadcast receiver for the IntentService
         IntentFilter filter = new IntentFilter(GpsReceiver.ACTION_RESP);
@@ -84,7 +85,10 @@ public class MainActivity extends Activity implements LocationListener {
 		
 		if (on){
 			result = result+"started.";
-			gpsStart();
+			String rs = gpsDtField.getText().toString();
+			long gpsDt = Math.round( Double.parseDouble(rs) * 60);
+						
+			gpsStart(gpsDt);
 		}else {
 			result = result+"stopped.";
 			gpsStop();
@@ -109,7 +113,7 @@ public class MainActivity extends Activity implements LocationListener {
 		} 
     }
     
-    public void gpsStart(){
+    public void gpsStart(long gpsDt){
     	/**
     	 * Starts a GPS IntentService. Also begins updating the GPS location in 
     	 * the main UI. The GPS 
@@ -127,7 +131,7 @@ public class MainActivity extends Activity implements LocationListener {
         gpsUpdateLatLon(location);
         
         // Start GPS logging
-        gpsStartLog();
+        gpsStartLog(gpsDt);
         
         // This causes this activity to listen for the onLocationChange broadcast.
         locationManager.requestLocationUpdates(provider, 1000, 1, this);
@@ -135,14 +139,20 @@ public class MainActivity extends Activity implements LocationListener {
     }
            
     public void gpsStop(){
-    	
+    	Log.d(TAG,"[gpsStop()] Stopping gps IntentService");
+    	boolean rs = stopService(gpsIntent);
+
+    	Log.d(TAG,"[gpsStop()]Stopped service: "+ rs +"+ Removing location updates");
+    	locationManager.removeUpdates(this);
     }
     
-    public void gpsStartLog(){
+    public void gpsStartLog(long gpsDt){
+    	// gpsDt should be in seconds
+    	
     	Log.d(TAG,"[gpsStartLog()]");
-    	Intent gpsIntent = new Intent(MainActivity.this, GpsIntentService.class);
+    	gpsIntent = new Intent(MainActivity.this, GpsIntentService.class);
 		gpsIntent.putExtra(GpsIntentService.PARAM_IN_MSG, "30*1000");
-		gpsIntent.putExtra(GpsIntentService.PARAM_GPS_DT, 30*1000);
+		gpsIntent.putExtra(GpsIntentService.PARAM_GPS_DT, gpsDt*1000);
 		
 		Log.d(TAG,"[gpsStartLog()] Starting gpsIntentService");
 		startService(gpsIntent);
@@ -231,7 +241,6 @@ public class MainActivity extends Activity implements LocationListener {
  		@Override
  		public void onReceive(Context context, Intent intent){
  			String text = intent.getStringExtra(GpsIntentService.PARAM_OUT_MSG);
- 			Log.d(TAG, "text: ");
  			Toast toast = Toast.makeText(MainActivity.this,
 					text,
 					Toast.LENGTH_LONG);

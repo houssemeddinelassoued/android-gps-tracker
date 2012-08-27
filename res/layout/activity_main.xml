@@ -1,5 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -28,9 +30,9 @@
             android:layout_above="@+id/textView2"
             android:layout_alignParentRight="true"
             android:layout_marginRight="24dp"
-            android:textOn="On" 
+            android:onClick="gpsToggleClicked"
             android:textOff="Off"
-            android:onClick="gpsToggleClicked" />
+            android:textOn="On" />
     </LinearLayout>
 
     <LinearLayout
@@ -39,26 +41,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="5dp" >
-    
-          <TextView
-              android:id="@+id/textView3"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginBottom="5dp"
-              android:text="Provider:"
-              android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-          <TextView
-              android:id="@+id/provider"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_centerVertical="true"
-              android:layout_marginLeft="5dp"
-              android:layout_toRightOf="@+id/textView4"
-              android:text="unavailable"
-              android:textAppearance="?android:attr/textAppearanceMedium" />
-    
-    
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Provider:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/provider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/textView4"
+            android:text="unavailable"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,26 +67,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout2"
         android:layout_marginTop="5dp" >
-    
-		  <TextView
-		      android:id="@+id/textView3"
-		      android:layout_width="wrap_content"
-		      android:layout_height="wrap_content"
-		      android:layout_marginBottom="5dp"
-		      android:text="Latitude"
-		      android:textAppearance="?android:attr/textAppearanceMedium" />
-		
-		  <TextView
-		      android:id="@+id/lat"
-		      android:layout_width="wrap_content"
-		      android:layout_height="wrap_content"
-		      android:layout_centerVertical="true"
-		      android:layout_marginLeft="5dp"
-		      android:layout_toRightOf="@+id/textView4"
-		      android:text="unavailable"
-		      android:textAppearance="?android:attr/textAppearanceMedium" />
-    
-    
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Latitude"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/lat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/textView4"
+            android:text="unavailable"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,49 +93,71 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout3"
         android:layout_marginTop="5dp" >
-    
-          <TextView
-              android:id="@+id/textView5"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginBottom="5dp"
-              android:text="Longitude"
-              android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-          <TextView
-              android:id="@+id/lon"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_centerVertical="true"
-              android:layout_marginLeft="5dp"
-              android:layout_toRightOf="@+id/textView5"
-              android:text="unavailable"
-              android:textAppearance="?android:attr/textAppearanceMedium" />   
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Longitude"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/lon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/textView5"
+            android:text="unavailable"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout4"
         android:layout_marginTop="5dp" >
-    
-          <TextView
-              android:id="@+id/textView5"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginBottom="5dp"
-              android:text="GPS Timestamp"
-              android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-          <TextView
-              android:id="@+id/gpsTimestampField"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_centerVertical="true"
-              android:layout_marginLeft="5dp"
-              android:layout_toRightOf="@+id/textView5"
-              android:text="unavailable"
-              android:textAppearance="?android:attr/textAppearanceMedium" />   
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="GPS Timestamp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/gpsTimestampField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/textView5"
+            android:text="unavailable"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
-    
+
+    <EditText
+        android:id="@+id/gpsDt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_marginLeft="41dp"
+        android:layout_marginTop="101dp"
+        android:layout_toRightOf="@+id/linearLayout5"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:text="0.2" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/gpsDt"
+        android:layout_toLeftOf="@+id/linearLayout1"
+        android:text="GPS DT (minutes):"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 </RelativeLayout>
